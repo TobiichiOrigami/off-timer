@@ -5,35 +5,18 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>下班倒數計時器</title>
-  <!-- 引入 Tailwind CSS 進行快速美化 -->
+
+  <!-- 引入 Tailwind CSS (CDN) -->
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- 引入 FontAwesome 圖示 -->
+
+  <!-- 引入 FontAwesome 圖示 (CDN) -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <!-- 設定字型 (Google Fonts: Noto Sans TC) -->
+
+  <!-- 引入 Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700&display=swap" rel="stylesheet">
 
-  <style>
-    body {
-      font-family: 'Noto Sans TC', sans-serif;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    }
-
-    /* 玻璃擬態效果 (Glassmorphism) */
-    .glass-panel {
-      background: rgba(255, 255, 255, 0.25);
-      box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
-      backdrop-filter: blur(4px);
-      -webkit-backdrop-filter: blur(4px);
-      border-radius: 10px;
-      border: 1px solid rgba(255, 255, 255, 0.18);
-    }
-
-    /* 隱藏原生時間選擇器的圖示，改用自訂樣式 */
-    input[type="time"]::-webkit-calendar-picker-indicator {
-      filter: invert(1);
-      cursor: pointer;
-    }
-  </style>
+  <!-- 引入自定義樣式 -->
+  <link rel="stylesheet" href="style.css">
 </head>
 
 <body class="min-h-screen flex items-center justify-center p-4 text-white">
@@ -93,113 +76,8 @@
 
   </div>
 
-  <script>
-    // 獲取 DOM 元素
-    const startTimeInput = document.getElementById('startTime');
-    const calculateBtn = document.getElementById('calculateBtn');
-    const resetBtn = document.getElementById('resetBtn');
-    const resultArea = document.getElementById('resultArea');
-    const endTimeDisplay = document.getElementById('endTimeDisplay');
-    const countdownDisplay = document.getElementById('countdown');
-    const statusText = document.getElementById('statusText');
-
-    let timerInterval;
-
-    // 設定預設時間為現在 (方便測試)
-    const now = new Date();
-    const hours = String(now.getHours()).padStart(2, '0');
-    const minutes = String(now.getMinutes()).padStart(2, '0');
-    startTimeInput.value = `${hours}:${minutes}`;
-
-    // 點擊開始計算
-    calculateBtn.addEventListener('click', () => {
-      const timeValue = startTimeInput.value;
-      if (!timeValue) {
-        alert('請先選擇打卡時間！');
-        return;
-      }
-
-      // 解析輸入的時間
-      const [inputHours, inputMinutes] = timeValue.split(':').map(Number);
-      const startDate = new Date();
-      startDate.setHours(inputHours, inputMinutes, 0, 0);
-
-      // 計算下班時間 (加 9 小時)
-      const endDate = new Date(startDate.getTime() + 9 * 60 * 60 * 1000);
-
-      // 顯示預計下班時間
-      const endHours = String(endDate.getHours()).padStart(2, '0');
-      const endMinutes = String(endDate.getMinutes()).padStart(2, '0');
-      endTimeDisplay.textContent = `${endHours}:${endMinutes}`;
-
-      // 切換介面狀態
-      startTimeInput.disabled = true;
-      calculateBtn.classList.add('hidden');
-      resetBtn.classList.remove('hidden');
-      resultArea.classList.remove('hidden');
-
-      // 立即執行一次更新，避免延遲
-      updateCountdown(endDate);
-
-      // 啟動計時器
-      if (timerInterval) clearInterval(timerInterval);
-      timerInterval = setInterval(() => {
-        updateCountdown(endDate);
-      }, 1000);
-    });
-
-    // 點擊重新設定
-    resetBtn.addEventListener('click', () => {
-      clearInterval(timerInterval);
-      startTimeInput.disabled = false;
-      calculateBtn.classList.remove('hidden');
-      resetBtn.classList.add('hidden');
-      resultArea.classList.add('hidden');
-      document.title = "下班倒數計時器";
-    });
-
-    // 更新倒數邏輯
-    function updateCountdown(endDate) {
-      const now = new Date();
-      const diff = endDate - now;
-
-      if (diff <= 0) {
-        // 時間到
-        clearInterval(timerInterval);
-        countdownDisplay.textContent = "00:00:00";
-        statusText.textContent = "🎉 下班啦！快回家休息吧！";
-        statusText.className = "mt-4 text-xl font-bold text-yellow-300 animate-bounce";
-        document.title = "🎉 下班啦！";
-        return;
-      }
-
-      // 計算時分秒
-      const h = Math.floor(diff / (1000 * 60 * 60));
-      const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-      const s = Math.floor((diff % (1000 * 60)) / 1000);
-
-      // 格式化顯示
-      const formattedTime =
-        `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
-
-      countdownDisplay.textContent = formattedTime;
-
-      // 動態更新網頁標題
-      document.title = `還剩 ${formattedTime} 下班`;
-
-      // 根據剩餘時間給予不同鼓勵語
-      if (h < 1) {
-        statusText.textContent = "最後衝刺！再撐一下！🔥";
-        statusText.className = "mt-4 text-sm font-bold text-red-300";
-      } else if (h < 4) {
-        statusText.textContent = "午後時光，喝杯咖啡吧 ☕";
-        statusText.className = "mt-4 text-sm font-bold text-orange-300";
-      } else {
-        statusText.textContent = "新的一天，保持專注 💪";
-        statusText.className = "mt-4 text-sm font-bold text-green-300";
-      }
-    }
-  </script>
+  <!-- 引入自定義腳本 -->
+  <script src="script.js"></script>
 </body>
 
 </html>

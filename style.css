@@ -1,0 +1,29 @@
+/* 設定全域字型 */
+body {
+    font-family: 'Noto Sans TC', sans-serif;
+    /* 背景漸層色 */
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+/* 玻璃擬態效果 (Glassmorphism) */
+.glass-panel {
+    background: rgba(255, 255, 255, 0.25);
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border-radius: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.18);
+}
+
+/* 針對 Webkit 瀏覽器 (Chrome, Safari, Edge) 自定義時間選擇器圖示顏色 */
+/* 將原本黑色的圖示反轉為白色，以符合深色背景 */
+input[type="time"]::-webkit-calendar-picker-indicator {
+    filter: invert(1);
+    cursor: pointer;
+    opacity: 0.8;
+    transition: opacity 0.2s;
+}
+
+input[type="time"]::-webkit-calendar-picker-indicator:hover {
+    opacity: 1;
+}
